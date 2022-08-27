@@ -1,5 +1,5 @@
 [package]
-name = "example-gtk4"
+name = "example-rust-gtk4"
 version = "0.1.0"
 edition = "2021"
 
