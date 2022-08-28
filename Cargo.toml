@@ -5,7 +5,7 @@ edition = "2021"
 
 [lib]
 name = "gauges"
-crate-type = ["cdylib"]
+crate-type = ["lib", "cdylib"]
 
 [dependencies.gtk]
 package = "gtk4"
