@@ -4,8 +4,7 @@ use gtk::glib;
 
 glib::wrapper! {
     pub struct SimpleGauge(ObjectSubclass<imp::SimpleGauge>)
-        @extends gtk::Widget,
-        @implements gtk::Accessible;
+        @extends gtk::Widget;
 }
 
 impl Default for SimpleGauge {

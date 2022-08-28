@@ -1,9 +1,10 @@
-mod simple_gauge;
-
-use gtk::{ApplicationWindow, Builder};
 use gtk::glib::StaticTypeExt;
-use relm4::{gtk, AppUpdate, Model, RelmApp, Sender,  Widgets};
+use gtk::{ApplicationWindow, Builder};
+use relm4::{gtk, AppUpdate, Model, RelmApp, Sender, Widgets};
+
 use crate::simple_gauge::SimpleGauge;
+
+mod simple_gauge;
 
 #[derive(Default)]
 struct AppModel {
@@ -47,9 +48,7 @@ impl Widgets<AppModel, ()> for AppWidgets {
         let builder = Builder::from_string(glade_src);
         let window: ApplicationWindow = builder.object("main_window").unwrap();
 
-        AppWidgets {
-            window
-        }
+        AppWidgets { window }
     }
     /// Return the root widget.
     fn root_widget(&self) -> Self::Root {
@@ -66,5 +65,6 @@ fn main() {
 
     let model = AppModel::default();
     let app = RelmApp::new(model);
+
     app.run();
 }

@@ -1,17 +1,11 @@
-use std::thread::{sleep, Thread};
-use std::time::Duration;
-use gtk::{Builder, ApplicationWindow};
+use gauges::simple_gauge::SimpleGauge;
 use gtk::prelude::*;
-
-use example_gtk4::simple_gauge::SimpleGauge;
+use gtk::{ApplicationWindow, Builder};
 
 fn main() {
     SimpleGauge::ensure_type();
 
-    let application = gtk::Application::new(
-        None,
-        Default::default(),
-    );
+    let application = gtk::Application::new(None, Default::default());
 
     application.connect_activate(|app| {
         let glade_src = include_str!("../src/gauge.glade");
