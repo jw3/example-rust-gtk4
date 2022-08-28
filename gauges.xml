@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<glade-catalog name="gauges" library="gauges" depends="gtk+">
+    <init-function>gauges_catalog_init</init-function>
+
+    <glade-widget-classes>
+        <glade-widget-class name="SimpleGauge" generic-name="simplegauge" title="Gauge Indicator"/>
+    </glade-widget-classes>
+
+    <glade-widget-group name="gauges" title="Gauges">
+        <glade-widget-class-ref name="SimpleGauge"/>
+    </glade-widget-group>
+</glade-catalog>
