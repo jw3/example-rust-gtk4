@@ -1,11 +1,12 @@
 use gtk::glib;
+use gtk::glib::once_cell::sync::Lazy;
+use gtk::glib::{ParamSpec, ParamSpecDouble, Value};
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use std::cell::RefCell;
 
 #[derive(Debug, Default)]
 pub struct SimpleGauge {
-    child: RefCell<Option<gtk::Widget>>,
+    child: gtk::Scale,
 }
 
 #[glib::object_subclass]
@@ -15,29 +16,39 @@ impl ObjectSubclass for SimpleGauge {
     type ParentType = gtk::Widget;
 
     fn class_init(klass: &mut Self::Class) {
-        // The layout manager determines how child widgets are laid out.
         klass.set_layout_manager_type::<gtk::BinLayout>();
     }
 }
 
 impl ObjectImpl for SimpleGauge {
+    fn properties() -> &'static [ParamSpec] {
+        static PROPERTIES: Lazy<Vec<ParamSpec>> =
+            Lazy::new(|| vec![ParamSpecDouble::builder("gauge-value").build()]);
+        PROPERTIES.as_ref()
+    }
+    fn set_property(&self, _obj: &Self::Type, _id: usize, value: &Value, pspec: &ParamSpec) {
+        match pspec.name() {
+            "gauge-value" => {
+                let range = &self.child;
+                let input_number = value.get().expect("f64 value");
+                range.set_value(input_number);
+            }
+            _ => unimplemented!(),
+        }
+    }
+
     fn constructed(&self, obj: &Self::Type) {
         self.parent_constructed(obj);
 
         // Create the child label.
-        let child = gtk::Scale::default();
-        child.set_range(0.0, 2400.0);
-        child.set_value(810.0);
+        let child = &self.child;
+        child.set_range(0.0, 6000.0);
         child.set_parent(obj);
         child.set_draw_value(true);
-        *self.child.borrow_mut() = Some(child.upcast::<gtk::Widget>());
     }
 
     fn dispose(&self, _obj: &Self::Type) {
-        // Child widgets need to be manually unparented in `dispose()`.
-        if let Some(child) = self.child.borrow_mut().take() {
-            child.unparent();
-        }
+        self.child.unparent();
     }
 }
 

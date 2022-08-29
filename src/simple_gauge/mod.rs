@@ -4,7 +4,8 @@ use gtk::glib;
 
 glib::wrapper! {
     pub struct SimpleGauge(ObjectSubclass<imp::SimpleGauge>)
-        @extends gtk::Widget;
+        @extends gtk::Widget,
+        @implements gtk::Buildable;
 }
 
 impl Default for SimpleGauge {
@@ -15,6 +16,6 @@ impl Default for SimpleGauge {
 
 impl SimpleGauge {
     pub fn new() -> Self {
-        glib::Object::new(&[]).expect("Failed to create auge")
+        glib::Object::new(&[]).expect("gobject creation")
     }
 }
