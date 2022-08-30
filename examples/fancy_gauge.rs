@@ -1,8 +1,8 @@
-use gauges::painted_gauge::PaintedGauge;
+use gauges::rendered_gauge::RenderedGauge;
 use gtk::prelude::*;
 
 fn main() {
-    PaintedGauge::ensure_type();
+    RenderedGauge::ensure_type();
 
     let application = gtk::Application::new(
         Some("com.github.gtk-rs.examples.paintable"),
@@ -17,7 +17,7 @@ fn build_ui(application: &gtk::Application) {
     window.set_title(Some("Custom Paintable"));
     window.set_default_size(350, 350);
 
-    let paintable = PaintedGauge::new();
+    let paintable = RenderedGauge::new();
 
     let picture = gtk::Picture::new();
     picture.set_halign(gtk::Align::Center);

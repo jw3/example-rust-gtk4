@@ -14,7 +14,7 @@ mod imp {
     use once_cell::sync::OnceCell;
 
     #[derive(Default)]
-    pub struct PaintedGauge {
+    pub struct RenderedGauge {
         pub handle: OnceCell<Vec<rsvg::SvgHandle>>,
         pub scale_factor: Cell<i32>,
         pub width: Cell<i32>,
@@ -22,9 +22,9 @@ mod imp {
     }
 
     #[glib::object_subclass]
-    impl ObjectSubclass for PaintedGauge {
-        const NAME: &'static str = "PaintedGauge";
-        type Type = super::PaintedGauge;
+    impl ObjectSubclass for RenderedGauge {
+        const NAME: &'static str = "RenderedGauge";
+        type Type = super::RenderedGauge;
         type ParentType = glib::Object;
         type Interfaces = (gdk::Paintable,);
 
@@ -38,7 +38,7 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for PaintedGauge {
+    impl ObjectImpl for RenderedGauge {
         fn properties() -> &'static [glib::ParamSpec] {
             static PROPERTIES: Lazy<Vec<glib::ParamSpec>> = Lazy::new(|| {
                 vec![glib::ParamSpecInt::new(
@@ -77,7 +77,7 @@ mod imp {
             };
         }
     }
-    impl PaintableImpl for PaintedGauge {
+    impl PaintableImpl for RenderedGauge {
         fn snapshot(
             &self,
             paintable: &Self::Type,
@@ -108,23 +108,23 @@ mod imp {
         }
     }
 
-    impl WidgetImpl for PaintedGauge {}
-    impl RangeImpl for PaintedGauge {}
+    impl WidgetImpl for RenderedGauge {}
+    impl RangeImpl for RenderedGauge {}
 }
 
 glib::wrapper! {
-    pub struct PaintedGauge(ObjectSubclass<imp::PaintedGauge>)
+    pub struct RenderedGauge(ObjectSubclass<imp::RenderedGauge>)
         @extends gtk::Widget, gtk::Range,
         @implements gdk::Paintable;
 }
 
-impl Default for PaintedGauge {
+impl Default for RenderedGauge {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl PaintedGauge {
+impl RenderedGauge {
     pub fn new() -> Self {
         let paintable: Self = glib::Object::new(&[]).unwrap();
         let parts = vec![
