@@ -2,6 +2,7 @@ use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use gtk::{cairo, gdk, glib, graphene};
 
+use gtk::glib::ffi::G_PI;
 use rsvg::SvgHandle;
 use std::cell::Cell;
 use std::path::PathBuf;
@@ -75,11 +76,6 @@ mod imp {
                 _ => unimplemented!(),
             };
         }
-
-        // ! yah !
-        fn constructed(&self, obj: &Self::Type) {
-            obj.set_range(0.0, 120.0);
-        }
     }
     impl PaintableImpl for PaintedGauge {
         fn snapshot(
@@ -136,6 +132,8 @@ impl PaintedGauge {
             "resources/clock-drop-shadow.svg",
             "resources/clock-face.svg",
             "resources/clock-marks.svg",
+            "resources/clock-minute-hand-shadow.svg",
+            "resources/clock-minute-hand.svg",
             "resources/clock-face-shadow.svg",
             "resources/clock-glass.svg",
             "resources/clock-frame.svg",
@@ -166,11 +164,65 @@ impl PaintedGauge {
             .map(|h| rsvg::CairoRenderer::new(h))
             .collect();
 
-        // FIXME Remove if https://gitlab.gnome.org/GNOME/librsvg/-/issues/826 is fixed
         let surface = cairo::ImageSurface::create(cairo::Format::ARgb32, width, height)?;
         let cr2 = cairo::Context::new(&surface)?;
 
-        for renderer in renderers {
+        for renderer in renderers.iter().take(5) {
+            renderer.render_document(
+                &cr2,
+                &cairo::Rectangle {
+                    x: 0.0,
+                    y: 0.0,
+                    width: width as f64,
+                    height: height as f64,
+                },
+            )?;
+        }
+
+        let lower = -4000.0;
+        let upper = 4000.0;
+        let adjustment_get_value = 2000.0;
+        let angle = adjustment_get_value * 2.0 * G_PI / (upper - lower);
+
+        let angle = -angle;
+
+        println!("angle: {}", angle);
+
+        // 1
+        cr2.save()?;
+
+        cr2.translate(width as f64 / 2.0, height as f64 / 2.0);
+        cr2.save()?;
+
+        //cr2.translate(-0.75, 0.75);
+        cr2.rotate(angle);
+
+        renderers[4].render_document(
+            &cr2,
+            &cairo::Rectangle {
+                x: 0.0,
+                y: 0.0,
+                width: width as f64,
+                height: height as f64,
+            },
+        )?;
+
+        cr2.restore()?;
+        cr2.rotate(angle);
+
+        renderers[5].render_document(
+            &cr2,
+            &cairo::Rectangle {
+                x: 0.0,
+                y: 0.0,
+                width: width as f64,
+                height: height as f64,
+            },
+        )?;
+
+        cr2.restore()?;
+
+        for renderer in renderers.iter().skip(4 + 2) {
             renderer.render_document(
                 &cr2,
                 &cairo::Rectangle {
