@@ -1,3 +1,4 @@
+pub mod painted_gauge;
 pub mod simple_gauge;
 
 #[no_mangle]

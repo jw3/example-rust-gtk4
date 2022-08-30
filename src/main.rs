@@ -47,7 +47,7 @@ impl Widgets<AppModel, ()> for AppState {
     type Root = ApplicationWindow;
 
     fn init_view(_model: &AppModel, _parent_widgets: &(), sender: Sender<AppMsg>) -> Self {
-        let glade_src = include_str!("gauge.glade");
+        let glade_src = include_str!("painted_gauge.glade");
         let builder = Builder::from_string(glade_src);
         let window: ApplicationWindow = builder.object("main_window").unwrap();
         let gauge: SimpleGauge = builder.object("gauge").unwrap();
