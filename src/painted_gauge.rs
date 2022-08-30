@@ -1,12 +1,10 @@
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use gtk::{cairo, gdk, gio, glib, graphene};
+use gtk::{cairo, gdk, glib, graphene};
 
-use gtk::gio::Cancellable;
 use rsvg::SvgHandle;
 use std::cell::Cell;
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 mod imp {
     use super::*;
@@ -77,6 +75,11 @@ mod imp {
                 _ => unimplemented!(),
             };
         }
+
+        // ! yah !
+        fn constructed(&self, obj: &Self::Type) {
+            obj.set_range(0.0, 120.0);
+        }
     }
     impl PaintableImpl for PaintedGauge {
         fn snapshot(
@@ -108,10 +111,14 @@ mod imp {
             renderer.intrinsic_dimensions().height.length as i32
         }
     }
+
+    impl WidgetImpl for PaintedGauge {}
+    impl RangeImpl for PaintedGauge {}
 }
 
 glib::wrapper! {
     pub struct PaintedGauge(ObjectSubclass<imp::PaintedGauge>)
+        @extends gtk::Widget, gtk::Range,
         @implements gdk::Paintable;
 }
 

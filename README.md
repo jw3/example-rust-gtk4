@@ -20,6 +20,7 @@ Demonstrating a custom widget through the creation of a gauge that displays some
 - https://github.com/gtk-rs/gtk4-rs/tree/master/examples
 - https://www.figuiere.net/technotes/notes/tn003/
 - https://gitlab.gnome.org/GNOME/niepce
+- https://github.com/pop-os/cosmic-applets
 
 ## license
 
