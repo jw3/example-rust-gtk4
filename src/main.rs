@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
+use std::num::ParseFloatError;
 use std::path::{Path, PathBuf};
 use std::thread::spawn;
 use std::time::Duration;
@@ -55,6 +56,8 @@ impl Widgets<AppModel, ()> for AppState {
         let mut watchers = vec![];
         watchers.push(watch(0, "/sys/class/hwmon/hwmon5/fan1_input", &_sender));
         watchers.push(watch(1, "/sys/class/hwmon/hwmon5/fan2_input", &_sender));
+        watchers.push(watch(2, "/sys/class/hwmon/hwmon4/temp1_input", &_sender));
+        watchers.push(watch(3, "/sys/class/hwmon/hwmon7/temp1_input", &_sender));
 
         let mut gauges = vec![];
         for i in 0..9 {
@@ -91,15 +94,16 @@ fn watch(id: usize, path: &str, sender: &Sender<AppMsg>) -> PollWatcher {
     watcher.watch(&path, RecursiveMode::Recursive).unwrap();
     let sender = sender.clone();
 
-    // map the rx in the model over to the sender
+    // initialize the view with a reading
+    let va: f64 = path_to_reading(&path).unwrap();
+    sender.send(AppMsg::Update(id, va)).unwrap();
+
+    // watch for changes and send them over through the sender
     spawn(move || loop {
         for e in rx.recv() {
             match e {
                 Ok(_) => {
-                    let mut f = File::open(&path).unwrap();
-                    let mut line = String::new();
-                    f.read_to_string(&mut line).unwrap();
-                    let va: f64 = line.trim_end().parse().unwrap();
+                    let va: f64 = path_to_reading(&path).unwrap();
                     sender.send(AppMsg::Update(id, va)).unwrap();
                 }
                 Err(e) => println!("watch error: {:?}", e),
@@ -108,6 +112,13 @@ fn watch(id: usize, path: &str, sender: &Sender<AppMsg>) -> PollWatcher {
     });
 
     watcher
+}
+
+fn path_to_reading(path: &Path) -> Result<f64, ParseFloatError> {
+    let mut f = File::open(&path).unwrap();
+    let mut line = String::new();
+    f.read_to_string(&mut line).unwrap();
+    line.trim_end().parse()
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
