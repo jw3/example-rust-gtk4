@@ -86,7 +86,7 @@ impl Widgets<AppModel, ()> for AppState {
 fn watch(id: usize, path: &str, sender: &Sender<AppMsg>) -> PollWatcher {
     let config = Config::default()
         .with_compare_contents(true) // crucial part for pseudo filesystems
-        .with_poll_interval(Duration::from_secs(1));
+        .with_poll_interval(Duration::from_millis(250));
 
     let path = PathBuf::from(path);
     let (tx, rx) = std::sync::mpsc::channel();
