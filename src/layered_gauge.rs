@@ -126,7 +126,6 @@ mod imp {
         }
 
         fn property(&self, _obj: &Self::Type, _id: usize, pspec: &ParamSpec) -> Value {
-            println!("get property {}", pspec.name());
             match pspec.name() {
                 "radius" => self.radius.get().to_value(),
                 "min" => self.min.get().to_value(),

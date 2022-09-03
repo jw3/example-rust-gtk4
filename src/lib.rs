@@ -2,7 +2,6 @@ use gtk::glib::ffi::G_PI;
 use gtk::glib::{ParamSpec, ParamSpecDouble, ParamSpecInt, ParamSpecUInt};
 
 pub mod layered_gauge;
-pub mod painted_gauge;
 pub mod rendered_gauge;
 pub mod simple_gauge;
 

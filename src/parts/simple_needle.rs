@@ -49,19 +49,18 @@ mod imp {
         }
         fn set_property(&self, _obj: &Self::Type, _id: usize, value: &Value, pspec: &ParamSpec) {
             match pspec.name() {
-                "radius" => self.radius.set(value.get().expect("f64 value")),
-                "min" => self.min.set(value.get().expect("f64 value")),
-                "max" => self.max.set(value.get().expect("f64 value")),
-                "start" => self.start.set(value.get().expect("i32 value")),
-                "end" => self.end.set(value.get().expect("i32 value")),
-                "value" => self.val.set(value.get().expect("f64 value")),
+                "radius" => self.radius.set(value.get().expect("f64")),
+                "min" => self.min.set(value.get().expect("f64")),
+                "max" => self.max.set(value.get().expect("f64")),
+                "start" => self.start.set(value.get().expect("i32")),
+                "end" => self.end.set(value.get().expect("i32")),
+                "value" => self.val.set(value.get().expect("f64")),
                 _ => unimplemented!(),
             }
         }
     }
     impl PaintableImpl for SimpleNeedle {
         fn snapshot(&self, _paintable: &Self::Type, snapshot: &Snapshot, width: f64, height: f64) {
-            println!("=============== needle {} ===============", self.val.get());
             let snapshot = snapshot.downcast_ref::<gtk::Snapshot>().unwrap();
             let rect = graphene::Rect::new(0.0, 0.0, width as f32, height as f32);
             let cr = snapshot.append_cairo(&rect);

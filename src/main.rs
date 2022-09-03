@@ -1,7 +1,3 @@
-use gtk::glib::{ObjectExt, StaticTypeExt};
-use gtk::{ApplicationWindow, Builder};
-use notify::{Config, PollWatcher, RecursiveMode, Watcher};
-use relm4::{gtk, AppUpdate, Model, RelmApp, Sender, Widgets};
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
@@ -9,7 +5,12 @@ use std::path::Path;
 use std::thread::spawn;
 use std::time::Duration;
 
-use crate::simple_gauge::SimpleGauge;
+use gtk::glib::{ObjectExt, StaticTypeExt};
+use gtk::{ApplicationWindow, Builder};
+use notify::{Config, PollWatcher, RecursiveMode, Watcher};
+use relm4::{gtk, AppUpdate, Model, RelmApp, Sender, Widgets};
+
+use gauges::layered_gauge::LayeredGauge;
 
 mod simple_gauge;
 
@@ -31,7 +32,7 @@ impl Model for AppModel {
 struct AppState {
     window: ApplicationWindow,
     _watcher: PollWatcher,
-    gauge: SimpleGauge,
+    gauges: Vec<LayeredGauge>,
 }
 
 impl AppUpdate for AppModel {
@@ -47,10 +48,9 @@ impl Widgets<AppModel, ()> for AppState {
     type Root = ApplicationWindow;
 
     fn init_view(_model: &AppModel, _parent_widgets: &(), sender: Sender<AppMsg>) -> Self {
-        let glade_src = include_str!("painted_gauge.glade");
+        let glade_src = include_str!("dash.glade");
         let builder = Builder::from_string(glade_src);
         let window: ApplicationWindow = builder.object("main_window").unwrap();
-        let gauge: SimpleGauge = builder.object("gauge").unwrap();
 
         let (tx, rx) = std::sync::mpsc::channel();
         let config = Config::default()
@@ -77,24 +77,32 @@ impl Widgets<AppModel, ()> for AppState {
             }
         });
 
+        let mut gauges = vec![];
+        for i in 0..9 {
+            let gauge: LayeredGauge = builder.object(&format!("g{}", i)).unwrap();
+            gauges.push(gauge)
+        }
+
         AppState {
             window,
             _watcher: watcher,
-            gauge,
+            gauges,
         }
     }
-    /// Return the root widget.
+
     fn root_widget(&self) -> Self::Root {
         self.window.clone()
     }
-    /// Update the view to represent the updated model.
+
     fn view(&mut self, _model: &AppModel, _sender: Sender<AppMsg>) {
-        self.gauge.set_property("gauge-value", _model.speed);
+        for gauge in &self.gauges {
+            gauge.set_property("value", _model.speed);
+        }
     }
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    SimpleGauge::ensure_type();
+    LayeredGauge::ensure_type();
 
     let model = AppModel::default();
     let app = RelmApp::new(model);

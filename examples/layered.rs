@@ -1,18 +1,18 @@
-use gauges::layered_gauge::LayeredGauge;
-use gauges::parts::simple_dial::SimpleDial;
-use gtk::builders::PictureBuilder;
-use gtk::glib::{ObjectExt, StaticTypeExt};
-use gtk::prelude::{GtkWindowExt, PaintableExt, WidgetExt};
-use gtk::subclass::prelude::ObjectSubclassIsExt;
-use gtk::{ApplicationWindow, Builder, DrawingArea, Picture};
-use notify::{Config, PollWatcher, RecursiveMode, Watcher};
-use relm4::{gtk, AppUpdate, Model, RelmApp, Sender, Widgets};
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use std::thread::spawn;
 use std::time::Duration;
+
+use gtk::glib::{ObjectExt, StaticTypeExt};
+use gtk::prelude::GtkWindowExt;
+use gtk::ApplicationWindow;
+use notify::{Config, PollWatcher, RecursiveMode, Watcher};
+use relm4::{gtk, AppUpdate, Model, RelmApp, Sender, Widgets};
+
+use gauges::layered_gauge::LayeredGauge;
+use gauges::parts::simple_dial::SimpleDial;
 
 #[derive(Debug, Default)]
 struct AppModel {
@@ -58,8 +58,8 @@ impl Widgets<AppModel, ()> for AppState {
 
         let (tx, rx) = std::sync::mpsc::channel();
         let config = Config::default()
-            .with_compare_contents(true) // crucial part for pseudo filesystems
-            .with_poll_interval(Duration::from_secs(1));
+            .with_compare_contents(true)
+            .with_poll_interval(Duration::from_millis(250));
 
         let path = Path::new("/sys/class/hwmon/hwmon5/fan1_input");
         let mut watcher = PollWatcher::new(tx, config).unwrap();

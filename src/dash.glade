@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkApplicationWindow" id="main_window">
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkGrid">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <child>
+          <object class="LayeredGauge" id="g0">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g1">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g2">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g3">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g4">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g5">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g6">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g7">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="LayeredGauge" id="g8">
+            <property name="radius">50.0</property>
+            <property name="min">0.0</property>
+            <property name="max">6000.0</property>
+            <property name="start">45</property>
+            <property name="end">135</property>
+            <property name="ticks">6</property>
+            <property name="width-request">100</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
