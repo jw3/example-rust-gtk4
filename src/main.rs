@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::thread::spawn;
 use std::time::Duration;
 
@@ -53,62 +53,8 @@ impl Widgets<AppModel, ()> for AppState {
         let window: ApplicationWindow = builder.object("main_window").unwrap();
 
         let mut watchers = vec![];
-        {
-            let config = Config::default()
-                .with_compare_contents(true) // crucial part for pseudo filesystems
-                .with_poll_interval(Duration::from_secs(1));
-
-            let path = Path::new("/sys/class/hwmon/hwmon5/fan1_input");
-            let (tx, rx) = std::sync::mpsc::channel();
-            let mut watcher = PollWatcher::new(tx, config).unwrap();
-            watcher.watch(&path, RecursiveMode::Recursive).unwrap();
-            let sender = _sender.clone();
-            watchers.push(watcher);
-
-            // map the rx in the model over to the sender
-            spawn(move || loop {
-                for e in rx.recv() {
-                    match e {
-                        Ok(_) => {
-                            let mut f = File::open(path).unwrap();
-                            let mut line = String::new();
-                            f.read_to_string(&mut line).unwrap();
-                            let va: f64 = line.trim_end().parse().unwrap();
-                            sender.send(AppMsg::Update(0, va)).unwrap();
-                        }
-                        Err(e) => println!("watch error: {:?}", e),
-                    }
-                }
-            });
-        }
-        {
-            let config = Config::default()
-                .with_compare_contents(true) // crucial part for pseudo filesystems
-                .with_poll_interval(Duration::from_secs(1));
-
-            let path = Path::new("/sys/class/hwmon/hwmon5/fan2_input");
-            let (tx, rx) = std::sync::mpsc::channel();
-            let mut watcher = PollWatcher::new(tx, config).unwrap();
-            watcher.watch(&path, RecursiveMode::Recursive).unwrap();
-            let sender = _sender.clone();
-            watchers.push(watcher);
-
-            // map the rx in the model over to the sender
-            spawn(move || loop {
-                for e in rx.recv() {
-                    match e {
-                        Ok(_) => {
-                            let mut f = File::open(path).unwrap();
-                            let mut line = String::new();
-                            f.read_to_string(&mut line).unwrap();
-                            let va: f64 = line.trim_end().parse().unwrap();
-                            sender.send(AppMsg::Update(1, va)).unwrap();
-                        }
-                        Err(e) => println!("watch error: {:?}", e),
-                    }
-                }
-            });
-        }
+        watchers.push(watch(0, "/sys/class/hwmon/hwmon5/fan1_input", &_sender));
+        watchers.push(watch(1, "/sys/class/hwmon/hwmon5/fan2_input", &_sender));
 
         let mut gauges = vec![];
         for i in 0..9 {
@@ -132,6 +78,36 @@ impl Widgets<AppModel, ()> for AppState {
             gauge.set_property("value", _model.speed[i]);
         }
     }
+}
+
+fn watch(id: usize, path: &str, sender: &Sender<AppMsg>) -> PollWatcher {
+    let config = Config::default()
+        .with_compare_contents(true) // crucial part for pseudo filesystems
+        .with_poll_interval(Duration::from_secs(1));
+
+    let path = PathBuf::from(path);
+    let (tx, rx) = std::sync::mpsc::channel();
+    let mut watcher = PollWatcher::new(tx, config).unwrap();
+    watcher.watch(&path, RecursiveMode::Recursive).unwrap();
+    let sender = sender.clone();
+
+    // map the rx in the model over to the sender
+    spawn(move || loop {
+        for e in rx.recv() {
+            match e {
+                Ok(_) => {
+                    let mut f = File::open(&path).unwrap();
+                    let mut line = String::new();
+                    f.read_to_string(&mut line).unwrap();
+                    let va: f64 = line.trim_end().parse().unwrap();
+                    sender.send(AppMsg::Update(id, va)).unwrap();
+                }
+                Err(e) => println!("watch error: {:?}", e),
+            }
+        }
+    });
+
+    watcher
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
