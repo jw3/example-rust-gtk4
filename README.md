@@ -22,6 +22,8 @@ Demonstrating a custom widget through the creation of a gauge that displays some
 - https://gitlab.gnome.org/GNOME/niepce
 - https://github.com/pop-os/cosmic-applets
 - https://gtkdcoding.com/2019/08/06/0059-cairo-iii-circles-and-arcs.html
+  - source of the cairo compass image
+- https://gitlab.gnome.org/jpu/cambalache
 
 ## license
 
