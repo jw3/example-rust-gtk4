@@ -31,13 +31,13 @@ pub(crate) fn double_prop(name: &str) -> ParamSpec {
     ParamSpecDouble::builder(name).build()
 }
 
-fn point_on_arc(r: f64, i: i32) -> (f64, f64) {
+pub fn point_on_arc(r: f64, i: i32) -> (f64, f64) {
     (
         r * (i as f64 * G_PI / 180.0).cos(),
         r * (i as f64 * G_PI / 180.0).sin(),
     )
 }
 
-fn point_to_arc(from: (f64, f64), a: f64, len: f64) -> (f64, f64) {
+pub fn point_to_arc(from: (f64, f64), a: f64, len: f64) -> (f64, f64) {
     (from.0 + (len * a.cos()), from.1 - (len * a.sin()))
 }
