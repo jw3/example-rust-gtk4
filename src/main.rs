@@ -16,11 +16,11 @@ mod simple_gauge;
 
 #[derive(Debug, Default)]
 struct AppModel {
-    speed: f64,
+    speed: [f64; 9],
 }
 
 enum AppMsg {
-    Update(f64),
+    Update(usize, f64),
 }
 
 impl Model for AppModel {
@@ -31,14 +31,14 @@ impl Model for AppModel {
 
 struct AppState {
     window: ApplicationWindow,
-    _watcher: PollWatcher,
+    watchers: Vec<PollWatcher>,
     gauges: Vec<LayeredGauge>,
 }
 
 impl AppUpdate for AppModel {
     fn update(&mut self, msg: AppMsg, _components: &(), _sender: Sender<AppMsg>) -> bool {
         match msg {
-            AppMsg::Update(speed) => self.speed = speed,
+            AppMsg::Update(id, speed) => self.speed[id] = speed,
         }
         true
     }
@@ -47,35 +47,68 @@ impl AppUpdate for AppModel {
 impl Widgets<AppModel, ()> for AppState {
     type Root = ApplicationWindow;
 
-    fn init_view(_model: &AppModel, _parent_widgets: &(), sender: Sender<AppMsg>) -> Self {
+    fn init_view(_model: &AppModel, _parent_widgets: &(), _sender: Sender<AppMsg>) -> Self {
         let glade_src = include_str!("dash.glade");
         let builder = Builder::from_string(glade_src);
         let window: ApplicationWindow = builder.object("main_window").unwrap();
 
-        let (tx, rx) = std::sync::mpsc::channel();
-        let config = Config::default()
-            .with_compare_contents(true) // crucial part for pseudo filesystems
-            .with_poll_interval(Duration::from_secs(1));
+        let mut watchers = vec![];
+        {
+            let config = Config::default()
+                .with_compare_contents(true) // crucial part for pseudo filesystems
+                .with_poll_interval(Duration::from_secs(1));
 
-        let path = Path::new("/sys/class/hwmon/hwmon5/fan1_input");
-        let mut watcher = PollWatcher::new(tx, config).unwrap();
-        watcher.watch(&path, RecursiveMode::Recursive).unwrap();
+            let path = Path::new("/sys/class/hwmon/hwmon5/fan1_input");
+            let (tx, rx) = std::sync::mpsc::channel();
+            let mut watcher = PollWatcher::new(tx, config).unwrap();
+            watcher.watch(&path, RecursiveMode::Recursive).unwrap();
+            let sender = _sender.clone();
+            watchers.push(watcher);
 
-        // map the rx in the model over to the sender
-        spawn(move || loop {
-            for e in rx.recv() {
-                match e {
-                    Ok(_) => {
-                        let mut f = File::open(path).unwrap();
-                        let mut line = String::new();
-                        f.read_to_string(&mut line).unwrap();
-                        let va: f64 = line.trim_end().parse().unwrap();
-                        sender.send(AppMsg::Update(va)).unwrap();
+            // map the rx in the model over to the sender
+            spawn(move || loop {
+                for e in rx.recv() {
+                    match e {
+                        Ok(_) => {
+                            let mut f = File::open(path).unwrap();
+                            let mut line = String::new();
+                            f.read_to_string(&mut line).unwrap();
+                            let va: f64 = line.trim_end().parse().unwrap();
+                            sender.send(AppMsg::Update(0, va)).unwrap();
+                        }
+                        Err(e) => println!("watch error: {:?}", e),
                     }
-                    Err(e) => println!("watch error: {:?}", e),
                 }
-            }
-        });
+            });
+        }
+        {
+            let config = Config::default()
+                .with_compare_contents(true) // crucial part for pseudo filesystems
+                .with_poll_interval(Duration::from_secs(1));
+
+            let path = Path::new("/sys/class/hwmon/hwmon5/fan2_input");
+            let (tx, rx) = std::sync::mpsc::channel();
+            let mut watcher = PollWatcher::new(tx, config).unwrap();
+            watcher.watch(&path, RecursiveMode::Recursive).unwrap();
+            let sender = _sender.clone();
+            watchers.push(watcher);
+
+            // map the rx in the model over to the sender
+            spawn(move || loop {
+                for e in rx.recv() {
+                    match e {
+                        Ok(_) => {
+                            let mut f = File::open(path).unwrap();
+                            let mut line = String::new();
+                            f.read_to_string(&mut line).unwrap();
+                            let va: f64 = line.trim_end().parse().unwrap();
+                            sender.send(AppMsg::Update(1, va)).unwrap();
+                        }
+                        Err(e) => println!("watch error: {:?}", e),
+                    }
+                }
+            });
+        }
 
         let mut gauges = vec![];
         for i in 0..9 {
@@ -85,7 +118,7 @@ impl Widgets<AppModel, ()> for AppState {
 
         AppState {
             window,
-            _watcher: watcher,
+            watchers,
             gauges,
         }
     }
@@ -95,8 +128,8 @@ impl Widgets<AppModel, ()> for AppState {
     }
 
     fn view(&mut self, _model: &AppModel, _sender: Sender<AppMsg>) {
-        for gauge in &self.gauges {
-            gauge.set_property("value", _model.speed);
+        for (i, gauge) in self.gauges.iter().enumerate() {
+            gauge.set_property("value", _model.speed[i]);
         }
     }
 }
